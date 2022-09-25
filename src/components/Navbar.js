@@ -37,7 +37,7 @@ export default function Navbar() {
           </button>
           <div className={showLogout ? "dropdown show-dropdown" : "dropdown"}>
             <button
-              onClick={() => dispatch(logoutUser())}
+              onClick={() => dispatch(logoutUser("Logging out..."))}
               className="dropdown-btn"
             >
               logout
