@@ -47,10 +47,12 @@ export const updateUser = createAsyncThunk(
     try {
       const resp = await customFetch.patch("/auth/updateUser", user, {
         headers: {
-          // dallo stato globale ricavo il token corrispondente all'utente che ha effetuato l'accesso
+          // dallo stato globale (thunkAPI.getState()) ricavo il token corrispondente all'utente che ha effetuato l'accesso
+          // in questo modo solo chi ha fatto il login puo' modificare i dati nel profilo
           authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
         },
       });
+      console.log(resp.data);
       return resp.data;
     } catch (error) {
       console.log(error.response);
