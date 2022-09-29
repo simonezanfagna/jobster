@@ -31,7 +31,7 @@ export default function BigSidebar(params) {
                   end
                   to={path}
                   key={id}
-                  onClick={() => dispatch(toggleSidebar())}
+                  /* onClick={() => dispatch(toggleSidebar())} */
                   className={({ isActive }) =>
                     isActive ? "nav-link active" : "nav-link"
                   }

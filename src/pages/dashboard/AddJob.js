@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import {
   clearValues,
   createJob,
+  editJob,
   handleChange,
 } from "../../features/job/jobSlice";
 
@@ -30,6 +31,15 @@ export default function AddJob() {
       toast.error("completa tutti i campi");
       return;
     }
+    if (isEditing) {
+      dispatch(
+        editJob({
+          jobId: editJobId,
+          job: { position, company, jobLocation, jobType, status },
+        })
+      );
+      return;
+    }
     dispatch(createJob({ position, company, jobLocation, jobType, status }));
   };
 
@@ -42,6 +52,8 @@ export default function AddJob() {
   return (
     <Wrapper>
       <form className="form">
+        <h3>{isEditing ? "edit job" : "add job"}</h3>
+
         <div className="form-center">
           {/* position */}
           <FormRow
