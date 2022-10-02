@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 const Wrapper = styled.article`
   padding: 2rem;
@@ -26,7 +26,7 @@ const Wrapper = styled.article`
   .icon {
     width: 70px;
     height: 60px;
-    background: ${(props) => props.bcg};
+    background-color: ${(props) => props.backgroundColor};
     border-radius: var(--borderRadius);
     display: flex;
     align-items: center;
@@ -36,6 +36,6 @@ const Wrapper = styled.article`
       color: ${(props) => props.color};
     }
   }
-`
+`;
 
-export default Wrapper
+export default Wrapper;
