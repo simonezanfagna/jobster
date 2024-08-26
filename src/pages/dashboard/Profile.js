@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormRow } from "../../components";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,16 +14,36 @@ export default function Profile() {
     email: user?.email || "",
     lastName: user?.lastName || "",
     location: user?.location || "",
+    password: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        name: user.name || "",
+        email: user.email || "",
+        lastName: user.lastName || "",
+        location: user.location || "",
+        password: "",
+      });
+    }
+  }, [user]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { name, email, lastName, location } = userData;
+    const { name, email, lastName, location, password } = userData;
     if (!name || !email || !lastName || !location) {
-      toast.error("completa tutti i campi");
+      toast.error("Email, name, last name and location are required");
       return;
     }
-    dispatch(updateUser(userData));
+
+    if (password === "") {
+      dispatch(updateUser({ name, email, lastName, location }));
+    } else if (password.includes(" ")) {
+      toast.error("Password must not contain spaces");
+    } else {
+      dispatch(updateUser(userData));
+    }
   };
 
   const handleChange = (e) => {
@@ -62,6 +82,12 @@ export default function Profile() {
             type="text"
             name="location"
             value={userData.location}
+            handleChange={handleChange}
+          />
+          <FormRow
+            type="password"
+            name="password"
+            value={userData.password}
             handleChange={handleChange}
           />
           <button className="btn btn-block" type="submit" disabled={isLoading}>

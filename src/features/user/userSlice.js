@@ -2,17 +2,19 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import customFetch from "../../utils/axios";
 import {
-  addUserToLocalStorage,
-  getUserFromLocalStorage,
-  removeUserFromLocalStorage,
+  addTokenToLocalStorage,
+  getTokenFromLocalStorage,
+  removeTokenFromLocalStorage,
 } from "../../utils/localStorage";
 import { clearAllJobsState } from "../allJobs/allJobsSlice";
 import { clearValues } from "../job/jobSlice";
 
 const initialState = {
   isLoading: false,
+  isLoadingUser: false,
   isSidebarOpen: false,
-  user: getUserFromLocalStorage(),
+  user: null,
+  token: getTokenFromLocalStorage(),
 };
 
 export const registerUser = createAsyncThunk(
@@ -51,7 +53,27 @@ export const updateUser = createAsyncThunk(
         headers: {
           // dallo stato globale (thunkAPI.getState()) ricavo il token corrispondente all'utente che ha effetuato l'accesso
           // in questo modo solo chi ha fatto il login puo' modificare i dati nel profilo
-          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+          authorization: `Bearer ${thunkAPI.getState().user.token}`,
+        },
+      });
+      console.log(resp.data);
+      return resp.data;
+    } catch (error) {
+      console.log(error.response);
+      return thunkAPI.rejectWithValue(error.response.data.msg);
+    }
+  }
+);
+
+export const getUserData = createAsyncThunk(
+  "user/userData",
+  async (_, thunkAPI) => {
+    try {
+      const resp = await customFetch.get("/@me", {
+        headers: {
+          // dallo stato globale (thunkAPI.getState()) ricavo il token corrispondente all'utente che ha effetuato l'accesso
+          // in questo modo solo chi ha fatto il login puo' modificare i dati nel profilo
+          authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
       console.log(resp.data);
@@ -91,8 +113,9 @@ const userSlice = createSlice({
     },
     logoutUser: (state, { payload }) => {
       state.user = null;
+      state.token = null;
       state.isSidebarOpen = false;
-      removeUserFromLocalStorage();
+      removeTokenFromLocalStorage();
       if (payload) {
         toast.success(payload);
       }
@@ -103,10 +126,10 @@ const userSlice = createSlice({
       state.isLoading = true;
     },
     [registerUser.fulfilled]: (state, { payload }) => {
-      const { user } = payload;
+      const { user, token } = payload;
       state.isLoading = false;
-      state.user = user;
-      addUserToLocalStorage(user);
+      state.token = token;
+      addTokenToLocalStorage(token);
       toast.success(`Ciao ${user.name}`);
     },
     [registerUser.rejected]: (state, { payload }) => {
@@ -117,10 +140,10 @@ const userSlice = createSlice({
       state.isLoading = true;
     },
     [loginUser.fulfilled]: (state, { payload }) => {
-      const { user } = payload;
+      const { user, token } = payload;
       state.isLoading = false;
-      state.user = user;
-      addUserToLocalStorage(user);
+      state.token = token;
+      addTokenToLocalStorage(token);
       toast.success(`Bentornato ${user.name}`);
     },
     [loginUser.rejected]: (state, { payload }) => {
@@ -131,10 +154,11 @@ const userSlice = createSlice({
       state.isLoading = true;
     },
     [updateUser.fulfilled]: (state, { payload }) => {
-      const { user } = payload;
+      const { user, token } = payload;
       state.isLoading = false;
+      state.token = token;
       state.user = user;
-      addUserToLocalStorage(user);
+      addTokenToLocalStorage(token);
       toast.success("dati aggiornati");
     },
     [updateUser.rejected]: (state, { payload }) => {
@@ -143,6 +167,17 @@ const userSlice = createSlice({
     },
     [clearStore.rejected]: () => {
       toast.error("errore");
+    },
+    [getUserData.pending]: (state) => {
+      state.isLoadingUser = true;
+    },
+    [getUserData.fulfilled]: (state, { payload }) => {
+      const { user } = payload;
+      state.isLoadingUser = false;
+      state.user = user;
+    },
+    [getUserData.rejected]: (state) => {
+      state.isLoadingUser = false;
     },
   },
 });

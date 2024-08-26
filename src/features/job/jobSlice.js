@@ -25,7 +25,7 @@ export const createJob = createAsyncThunk(
         headers: {
           // dallo stato globale (thunkAPI.getState()) ricavo il token corrispondente all'utente che ha effetuato l'accesso
           // in questo modo solo chi ha fatto il login puo' aggiungere un lavoro al quale si e' candidato
-          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+          authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
       thunkAPI.dispatch(clearValues());
@@ -44,7 +44,7 @@ export const deleteJob = createAsyncThunk(
       const resp = await customFetch.delete(`/jobs/${jobId}`, {
         headers: {
           // in questo modo solo chi ha fatto il login ed ha aggiunto il lavoro lo puo' eliminare
-          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+          authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
       thunkAPI.dispatch(getAllJobs());
@@ -63,7 +63,7 @@ export const editJob = createAsyncThunk(
       const resp = await customFetch.patch(`/jobs/${jobId}`, job, {
         headers: {
           // in questo modo solo chi ha fatto il login ed ha aggiunto il lavoro lo puo' modificare
-          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+          authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
       thunkAPI.dispatch(clearValues());

@@ -3,7 +3,7 @@
 import axios from "axios";
 
 const customFetch = axios.create({
-  baseURL: "https://jobify-prod.herokuapp.com/api/v1/toolkit",
+  baseURL: "http://127.0.0.1:5000",
 });
 
 export default customFetch;

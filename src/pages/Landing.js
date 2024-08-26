@@ -1,6 +1,6 @@
 import { Logo } from "../components";
 import { Link } from "react-router-dom";
-import main from "../assets/images/main.svg";
+import main from "../assets/images/j_main.png";
 import styled from "styled-components";
 
 export default function Landing() {

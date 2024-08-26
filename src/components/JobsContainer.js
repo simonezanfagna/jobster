@@ -45,8 +45,6 @@ export default function JobsContainer() {
       </h5>
       <div className="jobs">
         {jobs.map((job) => {
-          /* console.log(job); */
-          // _id e' un valore dato dal database MongoDB per rendere ogni job univoco
           return <Job key={job._id} {...job} />;
         })}
       </div>

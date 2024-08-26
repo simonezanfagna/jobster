@@ -16,7 +16,7 @@ const initialState = {
 export default function Register(params) {
   const [values, setValues] = useState(initialState);
 
-  const { user, isLoading } = useSelector((store) => store.user);
+  const { token, isLoading } = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
@@ -53,7 +53,7 @@ export default function Register(params) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
+    if (token) {
       // reindirizzo alla dashboard
       navigate("/");
 
@@ -62,7 +62,7 @@ export default function Register(params) {
         navigate("/");
       }, 1500); */
     }
-  }, [user]);
+  }, [token]);
 
   return (
     <Wrapper className="full-page">

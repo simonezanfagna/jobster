@@ -39,7 +39,7 @@ export const getAllJobs = createAsyncThunk(
       const resp = await customFetch.get(url, {
         headers: {
           // in questo modo solo chi ha fatto il login puo' vedere i lavori a cui si e' candidato
-          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+          authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
 
@@ -57,7 +57,7 @@ export const showStats = createAsyncThunk(
       const resp = await customFetch.get("/jobs/stats", {
         headers: {
           // in questo modo solo chi ha fatto il login puo' vedere le statistiche relative alle candidature
-          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+          authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
       console.log(resp.data);
