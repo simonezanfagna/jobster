@@ -7,6 +7,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
 )
+from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from flask_cors import CORS
@@ -62,6 +63,17 @@ class Job(db.Model):
     status = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    VALID_job_types = {"full-time", "part-time", "remote", "internship"}
+    VALID_statuses = {"interview", "declined", "pending"}
+
+    @classmethod
+    def is_valid_job_type(cls, job_type):
+        return job_type in cls.VALID_job_types
+
+    @classmethod
+    def is_valid_status(cls, status):
+        return status in cls.VALID_statuses
 
 
 # Routes
@@ -211,7 +223,7 @@ def update_user():
     return (
         jsonify(
             {
-                "message": "User updated successfully",
+                "msg": "User updated successfully",
                 "user": user.to_dict(),
                 "token": access_token,
             }
@@ -224,18 +236,38 @@ def update_user():
 @jwt_required()
 def create_job():
     current_user_id = get_jwt_identity()
-    data = request.json
+    data = request.get_json()
+
+    position = data.get("position")
+    company = data.get("company")
+    job_location = data.get("jobLocation")
+    job_type = data.get("jobType")
+    status = data.get("status")
+
+    if not position or not company or not status or not job_location or not job_type:
+        return (
+            jsonify({"msg": "Enter all the data"}),
+            400,
+        )
+
+    if not Job.is_valid_job_type(data["jobType"]):
+        return jsonify({"msg": "Invalid job type"}), 400
+
+    if not Job.is_valid_status(data["status"]):
+        return jsonify({"msg": "Invalid status"}), 400
+
     new_job = Job(
-        position=data["position"],
-        company=data["company"],
-        job_location=data["jobLocation"],
-        job_type=data["jobType"],
-        status=data["status"],
+        position=position,
+        company=company,
+        job_location=job_location,
+        job_type=job_type,
+        status=status,
         user_id=current_user_id,
     )
+
     db.session.add(new_job)
     db.session.commit()
-    return jsonify({"message": "Job created successfully"}), 201
+    return jsonify({"msg": "Job created successfully"}), 201
 
 
 @app.route("/jobs", methods=["GET"])
@@ -243,10 +275,53 @@ def create_job():
 def get_jobs():
     current_user_id = get_jwt_identity()
     page = request.args.get("page", 1, type=int)
-    per_page = 10  # Numero di lavori per pagina
-    jobs = Job.query.filter_by(user_id=current_user_id).paginate(
-        page=page, per_page=per_page
-    )
+    search = request.args.get("search", "")
+    search_status = request.args.get("status", "all")
+    search_type = request.args.get("jobType", "all")
+    sort = request.args.get("sort", "latest")
+
+    valid_statuses = {"all", "interview", "declined", "pending"}
+    valid_types = {"all", "full-time", "part-time", "remote", "internship"}
+    valid_sorts = {"latest", "oldest", "a-z", "z-a"}
+
+    if search_status not in valid_statuses:
+        return jsonify({"msg": "Invalid status"}), 400
+
+    if search_type not in valid_types:
+        return jsonify({"msg": "Invalid job type"}), 400
+
+    if sort not in valid_sorts:
+        return jsonify({"msg": "Invalid sort option"}), 400
+
+    # Start with a base query
+    query = Job.query.filter_by(user_id=current_user_id)
+
+    # Apply search filters
+    if search:
+        query = query.filter(Job.position.ilike(f"%{search}%"))
+
+    if search_status != "all":
+        query = query.filter(Job.status == search_status)
+
+    if search_type != "all":
+        query = query.filter(Job.job_type == search_type)
+
+    # Apply sorting
+    if sort == "latest":
+        query = query.order_by(desc(Job.created_at))
+    elif sort == "oldest":
+        query = query.order_by(Job.created_at)
+    elif sort == "a-z":
+        query = query.order_by(Job.position)
+    elif sort == "z-a":
+        query = query.order_by(desc(Job.position))
+
+    # Number of jobs per page
+    per_page = 10
+
+    # Paginate the results
+    jobs = query.paginate(page=page, per_page=per_page)
+
     return (
         jsonify(
             {

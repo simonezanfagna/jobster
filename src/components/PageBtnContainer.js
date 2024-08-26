@@ -8,9 +8,8 @@ export default function PageBtnContainer() {
 
   const dispatch = useDispatch();
 
-  // The Array.from() method returns an array from any object with a length property.
-  // costruisco un array da 1 al numero totale di pagine (numOfPages)
-  // mi serve per gestire il numero totali di pulsanti da mostare ed assegnare ad ogni pulsante il numero della pagina corrispondente
+  // creating an array from 1 to the total number of pages (numOfPages)
+  // to show the total number of buttons and assign each button the corresponding page number
   const pages = Array.from({ length: numOfPages }, (_, index) => {
     return index + 1;
   });

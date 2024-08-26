@@ -4,10 +4,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { toggleSidebar } from "../features/user/userSlice";
 import links from "../utils/links";
+import { clearValues } from "../features/job/jobSlice";
 
 export default function BigSidebar(params) {
   const { isSidebarOpen } = useSelector((store) => store.user);
+  const { isEditing } = useSelector((store) => store.job);
+
   const dispatch = useDispatch();
+
+  const handleNavLink = (path, isEditing) => {
+    if (path !== "add-job" && isEditing) {
+      dispatch(clearValues());
+    }
+  };
+
   return (
     <Wrapper>
       <div
@@ -25,8 +35,6 @@ export default function BigSidebar(params) {
             {links.map((link) => {
               const { text, path, id, icon } = link;
               return (
-                // A <NavLink> is a special kind of <Link> that knows whether or not it is "active".
-                // molto utile in questo caso per aggiungere la classe "nav-link active" quando e' attivo
                 <NavLink
                   end
                   to={path}
@@ -35,6 +43,9 @@ export default function BigSidebar(params) {
                   className={({ isActive }) =>
                     isActive ? "nav-link active" : "nav-link"
                   }
+                  onClick={() => {
+                    handleNavLink(path, isEditing);
+                  }}
                 >
                   <span className="icon">{icon}</span>
                   {text}

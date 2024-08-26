@@ -5,10 +5,18 @@ import Logo from "./Logo";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleSidebar } from "../features/user/userSlice";
 import links from "../utils/links";
+import { clearValues } from "../features/job/jobSlice";
 
 export default function SmallSidebar(params) {
   const { isSidebarOpen } = useSelector((store) => store.user);
+  const { isEditing } = useSelector((store) => store.job);
   const dispatch = useDispatch();
+
+  const handleNavLink = (path, isEditing) => {
+    if (path !== "add-job" && isEditing) {
+      dispatch(clearValues());
+    }
+  };
 
   return (
     <Wrapper>
@@ -31,13 +39,14 @@ export default function SmallSidebar(params) {
             {links.map((link) => {
               const { text, path, id, icon } = link;
               return (
-                // A <NavLink> is a special kind of <Link> that knows whether or not it is "active".
-                // molto utile in questo caso per aggiungere la classe "nav-link active" quando e' attivo
                 <NavLink
                   end
                   to={path}
                   key={id}
-                  onClick={() => dispatch(toggleSidebar())}
+                  onClick={() => {
+                    dispatch(toggleSidebar());
+                    handleNavLink(path, isEditing);
+                  }}
                   className={({ isActive }) =>
                     isActive ? "nav-link active" : "nav-link"
                   }

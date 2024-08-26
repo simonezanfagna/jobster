@@ -7,7 +7,7 @@ import moment from "moment/moment";
 import { deleteJob, setEditJob } from "../features/job/jobSlice";
 
 export default function Job({
-  _id,
+  id,
   position,
   company,
   jobLocation,
@@ -43,7 +43,7 @@ export default function Job({
               onClick={() => {
                 dispatch(
                   setEditJob({
-                    editJobId: _id,
+                    editJobId: id,
                     position,
                     company,
                     jobLocation,
@@ -59,7 +59,7 @@ export default function Job({
               type="button"
               className="btn delete-btn"
               onClick={() => {
-                dispatch(deleteJob(_id));
+                dispatch(deleteJob(id));
               }}
             >
               Delete
