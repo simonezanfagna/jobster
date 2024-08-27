@@ -9,7 +9,7 @@ from flask_jwt_extended import (
 )
 from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask_cors import CORS
 from helpers import validate_email
 
@@ -61,7 +61,7 @@ class Job(db.Model):
     job_location = db.Column(db.String(100), nullable=False)
     job_type = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     VALID_job_types = {"full-time", "part-time", "remote", "internship"}
@@ -353,8 +353,8 @@ def delete_job(job_id):
     if job:
         db.session.delete(job)
         db.session.commit()
-        return jsonify({"message": "Job deleted successfully"}), 200
-    return jsonify({"message": "Job not found"}), 404
+        return jsonify({"msg": "Job deleted successfully"}), 200
+    return jsonify({"msg": "Job not found"}), 404
 
 
 @app.route("/jobs/<int:job_id>", methods=["PATCH"])
@@ -363,15 +363,23 @@ def edit_job(job_id):
     current_user_id = get_jwt_identity()
     job = Job.query.filter_by(id=job_id, user_id=current_user_id).first()
     if job:
-        data = request.json
+        data = request.get_json()
+
+        if not Job.is_valid_job_type(data["jobType"]):
+            return jsonify({"msg": "Invalid job type"}), 400
+
+        if not Job.is_valid_status(data["status"]):
+            return jsonify({"msg": "Invalid status"}), 400
+
         job.position = data.get("position", job.position)
         job.company = data.get("company", job.company)
         job.job_location = data.get("jobLocation", job.job_location)
         job.job_type = data.get("jobType", job.job_type)
         job.status = data.get("status", job.status)
         db.session.commit()
-        return jsonify({"message": "Job updated successfully"}), 200
-    return jsonify({"message": "Job not found"}), 404
+        return jsonify({"msg": "Job updated successfully"}), 200
+
+    return jsonify({"msg": "Job not found"}), 404
 
 
 @app.route("/jobs/stats", methods=["GET"])
@@ -380,7 +388,7 @@ def get_stats():
     current_user_id = get_jwt_identity()
     jobs = Job.query.filter_by(user_id=current_user_id).all()
 
-    # Calcolo delle statistiche
+    # Calculation of statistics
     total_jobs = len(jobs)
     status_counts = {
         "pending": sum(1 for job in jobs if job.status == "pending"),
@@ -388,7 +396,7 @@ def get_stats():
         "declined": sum(1 for job in jobs if job.status == "declined"),
     }
 
-    # Calcolo delle applicazioni mensili
+    # Calculation of monthly applications
     monthly_applications = {}
     for job in jobs:
         month_key = job.created_at.strftime("%B %Y")
