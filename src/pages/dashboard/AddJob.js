@@ -28,7 +28,7 @@ export default function AddJob() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!position || !company || !jobLocation) {
-      toast.error("completa tutti i campi");
+      toast.error("enter all the data");
       return;
     }
     if (isEditing) {

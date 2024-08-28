@@ -8,7 +8,7 @@ export const removeTokenFromLocalStorage = () => {
 
 export const getTokenFromLocalStorage = () => {
   const result = localStorage.getItem("token");
-  // se il token e' presente in memoria
+  // if the token is present in memory:
   const token = result ? result : null;
   return token;
 };

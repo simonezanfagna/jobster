@@ -51,15 +51,12 @@ export const updateUser = createAsyncThunk(
     try {
       const resp = await customFetch.patch("/auth/updateUser", user, {
         headers: {
-          // dallo stato globale (thunkAPI.getState()) ricavo il token corrispondente all'utente che ha effetuato l'accesso
-          // in questo modo solo chi ha fatto il login puo' modificare i dati nel profilo
+          // adding the token of the logged in user to the header
           authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
-      console.log(resp.data);
       return resp.data;
     } catch (error) {
-      console.log(error.response);
       return thunkAPI.rejectWithValue(error.response.data.msg);
     }
   }
@@ -71,24 +68,22 @@ export const getUserData = createAsyncThunk(
     try {
       const resp = await customFetch.get("/@me", {
         headers: {
-          // dallo stato globale (thunkAPI.getState()) ricavo il token corrispondente all'utente che ha effetuato l'accesso
-          // in questo modo solo chi ha fatto il login puo' modificare i dati nel profilo
+          // adding the token of the logged in user to the header
           authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
-      console.log(resp.data);
       return resp.data;
     } catch (error) {
       if (error.response.status === 401) {
-        thunkAPI.dispatch(logoutUser());
+        thunkAPI.dispatch(clearStore());
       }
       return thunkAPI.rejectWithValue(error.response.data.msg);
     }
   }
 );
 
-// questa funzione viene richiamata al logout dell' utente
-// imposto tutti gli stati al loro rispettivo stato iniziale e viene fatto il logout
+// this function is called when the user logs out
+// setting all states to their respective initial states and logging out
 export const clearStore = createAsyncThunk(
   "user/clearStore",
   async (user, thunkAPI) => {
@@ -132,7 +127,7 @@ const userSlice = createSlice({
       state.isLoading = false;
       state.token = token;
       addTokenToLocalStorage(token);
-      toast.success(`Ciao ${user.name}`);
+      toast.success(`Hello ${user.name}`);
     },
     [registerUser.rejected]: (state, { payload }) => {
       state.isLoading = false;
@@ -146,7 +141,7 @@ const userSlice = createSlice({
       state.isLoading = false;
       state.token = token;
       addTokenToLocalStorage(token);
-      toast.success(`Bentornato ${user.name}`);
+      toast.success(`Welcome back ${user.name}`);
     },
     [loginUser.rejected]: (state, { payload }) => {
       state.isLoading = false;
@@ -161,14 +156,14 @@ const userSlice = createSlice({
       state.token = token;
       state.user = user;
       addTokenToLocalStorage(token);
-      toast.success("dati aggiornati");
+      toast.success("Data updated successfully");
     },
     [updateUser.rejected]: (state, { payload }) => {
       state.isLoading = false;
       toast.warning(payload);
     },
     [clearStore.rejected]: () => {
-      toast.error("errore");
+      toast.error("Error");
     },
     [getUserData.pending]: (state) => {
       state.isLoadingUser = true;

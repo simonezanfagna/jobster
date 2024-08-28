@@ -1,5 +1,6 @@
-// visto che SharedLayout e' una route parent (vedi App.js), uso Outlet per renderizzare i suoi child route
-// es. quando l' URL e' "/all-jobs" allora renderizza il componente AllJobs
+// since SharedLayout is a parent route (see App.js), I use Outlet to render its child routes
+
+//
 /* import { Outlet } from "react-router-dom";
 import { BigSidebar, Navbar, SmallSidebar } from "../../components";
 import Wrapper from "../../assets/wrappers/SharedLayout";

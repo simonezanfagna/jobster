@@ -1,4 +1,4 @@
-// creo una custom instance per avere come bese di tutte le chiamate API i seguenti valori
+// custom instance to use in all API calls
 
 import axios from "axios";
 

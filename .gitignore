@@ -28,6 +28,11 @@ venv/
 ENV/
 env/
 
+.flaskenv
+
+instance
+migrations
+
 *.pyc
 __pycache__/
 

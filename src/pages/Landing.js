@@ -30,10 +30,7 @@ export default function Landing() {
   );
 }
 
-// posso scrivere il css del componente direttamente nel file del proprio componente oppure
-// sriverlo in un file js separato ed importarlo (in questo progetto nella cartella wrappers ho creato i file con lo styled-component da importare nei relativi componenti)
-// ovviamente lo styled-component "Wrapper" NON e' responsabile della logica ma SOLO dello stile
-// solo per questo primo componente terro' lo styled-component nella pagina del relativo componente
+// styled-component
 const Wrapper = styled.main`
   nav {
     width: var(--fluid-width);

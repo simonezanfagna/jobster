@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import customFetch from "../../utils/axios";
-import { logoutUser } from "../user/userSlice";
+import { clearStore } from "../user/userSlice";
 
 const initialFiltersState = {
   search: "",
@@ -31,7 +31,6 @@ export const getAllJobs = createAsyncThunk(
 
     let url = `/jobs?status=${searchStatus}&jobType=${searchType}&sort=${sort}&page=${page}`;
 
-    // se si digita qaulcosa nel filter search allora aggiunge search alla ricerca
     if (search) {
       url = url + `&search=${search}`;
     }
@@ -39,7 +38,7 @@ export const getAllJobs = createAsyncThunk(
     try {
       const resp = await customFetch.get(url, {
         headers: {
-          // in questo modo solo chi ha fatto il login puo' vedere i lavori a cui si e' candidato
+          // adding the token of the logged in user to the header
           authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
@@ -47,7 +46,7 @@ export const getAllJobs = createAsyncThunk(
       return resp.data;
     } catch (error) {
       if (error.response.status === 401) {
-        thunkAPI.dispatch(logoutUser());
+        thunkAPI.dispatch(clearStore());
       }
       return thunkAPI.rejectWithValue(error.response.data.msg);
     }
@@ -60,11 +59,10 @@ export const showStats = createAsyncThunk(
     try {
       const resp = await customFetch.get("/jobs/stats", {
         headers: {
-          // in questo modo solo chi ha fatto il login puo' vedere le statistiche relative alle candidature
+          // adding the token of the logged in user to the header
           authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
-      console.log(resp.data);
       return resp.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data.msg);
@@ -83,11 +81,11 @@ const allJobsSlice = createSlice({
       state.isLoading = false;
     },
     handleChange: (state, { payload }) => {
-      state.page = 1; // serve per evitare bug durante la selezione di un filtro dopo la prima pagina
+      state.page = 1; // It is used to avoid bugs when selecting a filter after the first page
       state[payload.name] = payload.value;
     },
     clearFilters: (state) => {
-      // imposto i valori dell' initialFiltersState allo stato iniziale
+      // setting the initialFiltersState values ​​to the initial state
       return { ...state, ...initialFiltersState };
     },
     changePage: (state, { payload }) => {

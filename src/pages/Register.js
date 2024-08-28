@@ -29,11 +29,10 @@ export default function Register(params) {
   const onSubmit = (e) => {
     e.preventDefault();
 
-    // prima di inviare i dati controllo se sono stati inseriti
-    console.log(values);
+    // checking the data entered
     const { name, email, password, isMember } = values;
     if (!email || !password || (!isMember && !name)) {
-      toast.error("valore mancante");
+      toast.error("missing value");
       return;
     }
 
@@ -49,15 +48,14 @@ export default function Register(params) {
     setValues({ ...values, isMember: !values.isMember });
   };
 
-  // useNavigate serve per reindirizzare in modo programmato verso un altro indirizzo nell'app
   const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
-      // reindirizzo alla dashboard
+      // redirect to the dashboard
       navigate("/");
 
-      //se voglio aggiungere un po' di delay
+      //to add some delay
       /* setTimeout(() => {
         navigate("/");
       }, 1500); */

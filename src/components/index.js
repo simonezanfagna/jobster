@@ -1,5 +1,4 @@
-// file utile per evitare che si creino troppe righe di import nel componente in cui verranno importati
-// i componenti che fanno parte della cartella components
+// components that are part of the components folder
 
 import BigSidebar from "./BigSidebar";
 import ChartsContainer from "./ChartsContainer";

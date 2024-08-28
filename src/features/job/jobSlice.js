@@ -23,8 +23,7 @@ export const createJob = createAsyncThunk(
     try {
       const resp = await customFetch.post("/jobs", job, {
         headers: {
-          // dallo stato globale (thunkAPI.getState()) ricavo il token corrispondente all'utente che ha effetuato l'accesso
-          // in questo modo solo chi ha fatto il login puo' aggiungere un lavoro al quale si e' candidato
+          // adding the token of the logged in user to the header
           authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
@@ -43,7 +42,7 @@ export const deleteJob = createAsyncThunk(
     try {
       const resp = await customFetch.delete(`/jobs/${jobId}`, {
         headers: {
-          // in questo modo solo chi ha fatto il login ed ha aggiunto il lavoro lo puo' eliminare
+          // adding the token of the logged in user to the header
           authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
@@ -62,7 +61,7 @@ export const editJob = createAsyncThunk(
     try {
       const resp = await customFetch.patch(`/jobs/${jobId}`, job, {
         headers: {
-          // in questo modo solo chi ha fatto il login ed ha aggiunto il lavoro lo puo' modificare
+          // adding the token of the logged in user to the header
           authorization: `Bearer ${thunkAPI.getState().user.token}`,
         },
       });
@@ -79,17 +78,14 @@ const jobSlice = createSlice({
   initialState,
   reducers: {
     handleChange: (state, { payload }) => {
-      // seleziono dinamicamente la chiave nello state corrispondente al name che arriva
-      // e assegno il value
       state[payload.name] = payload.value;
     },
     clearValues: () => {
-      // imposto i valori allo stato iniziale
+      // setting the values ​​to the initial state
       return initialState;
     },
     setEditJob: (state, { payload }) => {
-      // assegno ai valori nello state i valori contenuti nel payload
-      // imposto isEditing: true
+      // assigning the values ​​contained in the payload to the values ​​in the state
       return { ...state, isEditing: true, ...payload };
     },
   },
@@ -99,7 +95,7 @@ const jobSlice = createSlice({
     },
     [createJob.fulfilled]: (state) => {
       state.isLoading = false;
-      toast.success("lavoro creato");
+      toast.success("New job added successfully!");
     },
     [createJob.rejected]: (state, { payload }) => {
       state.isLoading = false;
@@ -113,7 +109,7 @@ const jobSlice = createSlice({
     },
     [editJob.fulfilled]: (state) => {
       state.isLoading = false;
-      toast.success("lavoro modificato");
+      toast.success("Changes saved successfully!");
     },
     [editJob.rejected]: (state, { payload }) => {
       state.isLoading = false;

@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { getUserData } from "../../features/user/userSlice";
 
-// evito che un utente possa accedere alla dashboard (tutto cio' che comprende lo SharedLayout) senza aver fatto l'accesso
-// se l'utente non esiste lo reindirizzo alla pagina Landing
-// se effettua l'accesso correttamente va alla dashboard
-// questa funzione si attiva anche quando si effettua il logout in modo da essere reindirizzati alla landing page
+// preventing a user from being able to access the dashboard (everything that includes the SharedLayout) without having logged in
+// if the token does not exist, it will be redirected to the Landing page
+// if the user logs in successfully it goes to the dashboard
+// this function is also activated when the user logs out so as to be redirected to the landing page
 export default function ProtectedRoute({ children }) {
   const { token, user } = useSelector((store) => store.user);
   const dispatch = useDispatch();

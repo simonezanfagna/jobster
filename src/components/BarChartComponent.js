@@ -9,7 +9,7 @@ import {
 } from "recharts";
 
 export default function BarChartComponent({ data }) {
-  // "date" e "count" sono contenuti in { data }
+  // "date" e "count" are contained in { data }
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} margin={{ top: 50 }}>
